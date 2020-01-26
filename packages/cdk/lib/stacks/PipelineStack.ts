@@ -7,6 +7,7 @@ import { settings } from 'settings';
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
+  readonly githubToken: string;
 }
 
 const [ owner, repositoryName ] = settings.repo.split('/');
@@ -82,7 +83,7 @@ export class PipelineStack extends Stack {
               owner: owner,
               repo: repositoryName,
               branch: branch,
-              oauthToken: SecretValue.ssmSecure(`/${settings.service}/${process.env.STAGE}/GITHUB_TOKEN`, '1'),
+              oauthToken: SecretValue.plainText(props.githubToken),
               trigger: codepipeline_actions.GitHubTrigger.WEBHOOK,
               output: sourceOutput,
             }),

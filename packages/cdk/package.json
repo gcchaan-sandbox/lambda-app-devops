@@ -25,6 +25,7 @@
     "@types/jest": "24.9.1",
     "@types/node": "10.17.5",
     "aws-cdk": "^1.22.0",
+    "aws-sdk": "2.610.0",
     "jest": "^25.1.0",
     "settings": "0.0.0",
     "ts-jest": "^25.0.0",
