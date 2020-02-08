@@ -1,9 +1,12 @@
 import * as codebuild from '@aws-cdk/aws-codebuild';
 import * as codepipeline from '@aws-cdk/aws-codepipeline';
 import * as codepipeline_actions from '@aws-cdk/aws-codepipeline-actions';
+import * as iam from '@aws-cdk/aws-iam';
 import * as lambda from '@aws-cdk/aws-lambda';
 import { Construct, SecretValue,Stack, StackProps } from '@aws-cdk/core';
 import { settings } from 'settings';
+
+import { buildSpecCDK, buildSpecLambda } from '../assets/buildspec';
 
 export interface PipelineStackProps extends StackProps {
   readonly lambdaCode: lambda.CfnParametersCode;
@@ -18,67 +21,22 @@ export class PipelineStack extends Stack {
     super(scope, id, props);
 
     const cdkBuild = new codebuild.PipelineProject(this, 'CdkBuild', {
-      buildSpec: codebuild.BuildSpec.fromObject({
-        version: '0.2',
-        phases: {
-          install: {
-            commands: [
-              '# install yarn',
-              'sudo apt-get update && sudo apt-get install apt-transport-https',
-              'curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -',
-              'echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list',
-              'sudo apt-get update && sudo apt-get install yarn',
-              'yarn --version',
-            ]
-          },
-          pre_build: {
-            commands: 'yarn install',
-          },
-          build: {
-            commands: [
-              'yarn run lint',
-              'yarn run build',
-              'cd packages/cdk && npx cdk synth -o dist'
-            ],
-          },
-        },
-        artifacts: {
-          'base-directory': 'packages/cdk/dist',
-          files: [
-            'lambdaops-lambda-production.template.json',
-          ],
-        },
-      }),
+      buildSpec: codebuild.BuildSpec.fromObject(buildSpecCDK),
       environment: {
         buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
       },
     });
-    const lambdaBuild = new codebuild.PipelineProject(this, 'LambdaBuild', {
-      // buildSpec: codebuild.BuildSpec.fromObject({
-      //   version: '0.2',
-      //   phases: {
-      //     install: {
-      //       commands: [
-      //         'cd lambda',
-      //         'npm install',
-      //       ],
-      //     },
-      //     build: {
-      //       commands: 'npm run build',
-      //     },
-      //   },
-      //   artifacts: {
-      //     'base-directory': 'lambda',
-      //     files: [
-      //       'index.js',
-      //       'node_modules/**/*',
-      //     ],
-      //   },
-      // }),
-      environment: {
-        buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
-      },
-    });
+    // const lambdaBuild = new codebuild.PipelineProject(this, 'LambdaBuild', {
+    //   buildSpec: codebuild.BuildSpec.fromObject(buildSpecLambda),
+    //   environment: {
+    //     buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
+    //   },
+    // });
+    // lambdaBuild.addToRolePolicy(new iam.PolicyStatement({
+    //   resources: [targetFunction.functionArn],
+    //   actions: ['lambda:UpdateFunctionCode',
+    //             'lambda:UpdateFunctionConfiguration',] }
+    // ));
 
     const sourceOutput = new codepipeline.Artifact();
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');

@@ -7,7 +7,6 @@ export class StorageStack extends cdk.Stack {
     super(scope, id, props);
     new s3.Bucket(this, 'ArtifactBucket', {
       bucketName: `${settings.service}-artifact`,
-      versioned: true,
     });
   }
 }
