@@ -14,11 +14,15 @@ const ssm = new AWS.SSM({apiVersion: 'latest', region: 'ap-northeast-1'});
 const app = new cdk.App();
 
 async function main() {
-  const request = {
-    Name: `/${settings.service}/GITHUB_TOKEN`,
-    WithDecryption: true
-  };
-  const ssmGithubTokenResponse = await ssm.getParameter(request).promise();
+  let githubToken: string;
+  if(process.env.PREPARE && process.env.PREPARE === 'true') {
+    const request = {
+      Name: `/${settings.service}/GITHUB_TOKEN`,
+      WithDecryption: true
+    };
+    const ssmGithubTokenResponse = await ssm.getParameter(request).promise();
+    githubToken = ssmGithubTokenResponse.Parameter?.Value || ''
+  }
   // console.log(ssmGithubTokenResponse.Parameter?.Value);
   const props: cdk.StackProps = {
     tags: {
@@ -36,7 +40,7 @@ async function main() {
       ...props,
       ...{
         lambdaCode: lambdaStack.lambdaCode,
-        githubToken: ssmGithubTokenResponse.Parameter?.Value!,
+        githubToken: githubToken,
       }
     });
   });
