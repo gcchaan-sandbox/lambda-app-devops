@@ -11,11 +11,12 @@ interface LambdaDeployStrategy {
   deployConfig: codedeploy.ILambdaDeploymentConfig;
 }
 export class LambdaStack extends Stack {
-  public readonly lambdaCode: lambda.CfnParametersCode;
+  // public readonly lambdaCode: lambda.CfnParametersCode;
+  readonly lambdaFunction: lambda.Function;
   constructor(scope: Construct, id: string, props: LambdaStackProps) {
     super(scope, id, props);
-    this.lambdaCode = lambda.Code.cfnParameters();
-    const fn = new lambda.Function(this, 'MyFunction', {
+    // this.lambdaCode = lambda.Code.cfnParameters();
+    this.lambdaFunction = new lambda.Function(this, 'MyFunction', {
       description: `Generated on: ${new Date().toISOString()}`,
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'index.awesomeBatch',
@@ -23,7 +24,7 @@ export class LambdaStack extends Stack {
     });
     const lambdaDeployStrategies: LambdaDeployStrategy[] = [
       {
-        function: fn,
+        function: this.lambdaFunction,
         deployConfig: codedeploy.LambdaDeploymentConfig.ALL_AT_ONCE
       }
     ]

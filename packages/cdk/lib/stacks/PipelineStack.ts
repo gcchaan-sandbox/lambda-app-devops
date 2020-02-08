@@ -9,7 +9,8 @@ import { settings } from 'settings';
 import { buildSpecCDK, buildSpecLambda } from '../assets/buildspec';
 
 export interface PipelineStackProps extends StackProps {
-  readonly lambdaCode: lambda.CfnParametersCode;
+  // readonly lambdaCode: lambda.CfnParametersCode;
+  readonly lambdaFunction: lambda.Function,
   readonly githubToken: string;
 }
 
@@ -23,20 +24,22 @@ export class PipelineStack extends Stack {
     const cdkBuild = new codebuild.PipelineProject(this, 'CdkBuild', {
       buildSpec: codebuild.BuildSpec.fromObject(buildSpecCDK),
       environment: {
-        buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
+        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_2,
       },
     });
     const lambdaBuild = new codebuild.PipelineProject(this, 'LambdaBuild', {
       buildSpec: codebuild.BuildSpec.fromObject(buildSpecLambda),
       environment: {
-        buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
+        buildImage: codebuild.LinuxBuildImage.AMAZON_LINUX_2_2,
       },
     });
-    // lambdaBuild.addToRolePolicy(new iam.PolicyStatement({
-    //   resources: [targetFunction.functionArn],
-    //   actions: ['lambda:UpdateFunctionCode',
-    //             'lambda:UpdateFunctionConfiguration',] }
-    // ));
+    lambdaBuild.addToRolePolicy(new iam.PolicyStatement({
+      resources: [props.lambdaFunction.functionArn],
+      actions: [
+        'lambda:UpdateFunctionCode',
+        'lambda:UpdateFunctionConfiguration',
+      ]
+    }));
 
     const sourceOutput = new codepipeline.Artifact();
     const cdkBuildOutput = new codepipeline.Artifact('CdkBuildOutput');

@@ -18,5 +18,6 @@
       "@/*": ["packages/*"]
     }
   },
-  "include": ["packages"]
+  "include": ["packages"],
+  "exclude": ["**/*.test.ts"]
 }

@@ -41,7 +41,8 @@ async function main() {
     });
     new PipelineStack(app, `${settings.service}-pipeline-${env}`, {
       ...props,
-      lambdaCode: lambdaStack.lambdaCode,
+      // lambdaCode: lambdaStack.lambdaCode,
+      lambdaFunction: lambdaStack.lambdaFunction,
       githubToken: githubToken,
     });
   });
