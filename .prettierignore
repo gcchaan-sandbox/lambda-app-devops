@@ -1,4 +1,7 @@
 coverage/
 dist/
 node_modules/
+
+#cdk
+.cache/
 cdk.out/

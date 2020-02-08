@@ -16,8 +16,9 @@ export const buildSpecCDK = {
       },
       build: {
         commands: [
-          'cd packages/cdk',
           'yarn run lint',
+          'yarn run test',
+          'cd packages/cdk',
           'yarn run build',
           'npx cdk synth -o dist'
         ],
@@ -47,8 +48,6 @@ export const buildSpecLambda = {
     build: {
       commands: [
         'cd packages/function-batch',
-        'yarn run lint',
-        'yarn run test',
         'yarn run build',
         // 'yarn run deploy',
         // S3にする
