@@ -16,9 +16,10 @@ export const buildSpecCDK = {
       },
       build: {
         commands: [
+          'cd packages/cdk',
           'yarn run lint',
           'yarn run build',
-          'cd packages/cdk && npx cdk synth -o dist'
+          'npx cdk synth -o dist'
         ],
       },
     },
@@ -35,25 +36,31 @@ export const buildSpecLambda = {
   phases: {
     install: {
       commands: [
-        'cd lambda',
-        'npm install',
-      ],
+        '# install yarn',
+        'sudo apt-get update && sudo apt-get install apt-transport-https',
+        'curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -',
+        'echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list',
+        'sudo apt-get update && sudo apt-get install yarn',
+        'yarn --version',
+      ]
     },
     build: {
       commands: [
+        'cd packages/function-batch',
+        'yarn run lint',
+        'yarn run test',
         'yarn run build',
-        'aws s3 cp ./ s3://bucket',
+        // 'yarn run deploy',
         // S3にする
-        'aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://$ZIP_FILE --publish',
+        // 'aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://$ZIP_FILE --publish',
         // バージョンに対してE2Eテストしてリリース?
       ],
     },
   },
   artifacts: {
-    'base-directory': 'lambda',
+    'base-directory': 'packages/function-batch/dist',
     files: [
-      'index.js',
-      'node_modules/**/*',
+      'artifact.zip',
     ],
   },
 }

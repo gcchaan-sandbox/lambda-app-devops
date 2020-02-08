@@ -26,12 +26,12 @@ export class PipelineStack extends Stack {
         buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
       },
     });
-    // const lambdaBuild = new codebuild.PipelineProject(this, 'LambdaBuild', {
-    //   buildSpec: codebuild.BuildSpec.fromObject(buildSpecLambda),
-    //   environment: {
-    //     buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
-    //   },
-    // });
+    const lambdaBuild = new codebuild.PipelineProject(this, 'LambdaBuild', {
+      buildSpec: codebuild.BuildSpec.fromObject(buildSpecLambda),
+      environment: {
+        buildImage: codebuild.LinuxBuildImage.UBUNTU_14_04_NODEJS_10_14_1,
+      },
+    });
     // lambdaBuild.addToRolePolicy(new iam.PolicyStatement({
     //   resources: [targetFunction.functionArn],
     //   actions: ['lambda:UpdateFunctionCode',
@@ -60,12 +60,12 @@ export class PipelineStack extends Stack {
         {
           stageName: 'Build',
           actions: [
-            // new codepipeline_actions.CodeBuildAction({
-            //   actionName: 'Lambda_Build',
-            //   project: lambdaBuild,
-            //   input: sourceOutput,
-            //   outputs: [lambdaBuildOutput],
-            // }),
+            new codepipeline_actions.CodeBuildAction({
+              actionName: 'Lambda_Build',
+              project: lambdaBuild,
+              input: sourceOutput,
+              outputs: [lambdaBuildOutput],
+            }),
             new codepipeline_actions.CodeBuildAction({
               actionName: 'CDK_Build',
               project: cdkBuild,

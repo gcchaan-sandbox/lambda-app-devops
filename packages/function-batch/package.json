@@ -4,6 +4,8 @@
   "private": true,
   "scripts": {
     "build": "parcel build --target node  --bundle-node-modules index.ts --out-dir dist --out-file index",
+    "predeploy": "zip -j ./dist/artifact.zip ./dist/index.js*",
+    "deploy": "aws s3 cp ./dist/artifact.zip s3://lambdaops-artifact/production/function-batch/",
     "test": "jest"
   },
   "dependencies": {

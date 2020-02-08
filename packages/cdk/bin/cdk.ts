@@ -31,17 +31,18 @@ async function main() {
   }
 
   // non-Stage Stack
-  new StorageStack(app, `${settings.service}-storage`, props);
+  const storageStack = new StorageStack(app, `${settings.service}-storage`, props);
 
   // Stage Stack
   settings.environments.forEach(env => {
-    const lambdaStack = new LambdaStack(app, `${settings.service}-lambda-${env}`, props);
+    const lambdaStack = new LambdaStack(app, `${settings.service}-lambda-${env}`, {
+      ...props,
+      artifactBucket: storageStack.artifactBucket,
+    });
     new PipelineStack(app, `${settings.service}-pipeline-${env}`, {
       ...props,
-      ...{
-        lambdaCode: lambdaStack.lambdaCode,
-        githubToken: githubToken,
-      }
+      lambdaCode: lambdaStack.lambdaCode,
+      githubToken: githubToken,
     });
   });
 }
