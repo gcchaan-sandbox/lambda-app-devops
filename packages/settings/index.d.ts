@@ -1,6 +1,6 @@
 interface Settings {
   service: string;
-  environments: string[];
+  stage: string;
   repo: string;
 }
 

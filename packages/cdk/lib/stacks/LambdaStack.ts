@@ -4,7 +4,7 @@ import * as s3 from '@aws-cdk/aws-s3';
 import { Construct, Stack, StackProps } from '@aws-cdk/core';
 
 export interface LambdaStackProps extends StackProps {
-  readonly artifactBucket: s3.Bucket,
+  // readonly artifactBucket: s3.Bucket,
 }
 interface LambdaDeployStrategy {
   function: lambda.Function;
@@ -20,7 +20,8 @@ export class LambdaStack extends Stack {
       description: `Generated on: ${new Date().toISOString()}`,
       runtime: lambda.Runtime.NODEJS_12_X,
       handler: 'index.awesomeBatch',
-      code: lambda.Code.fromBucket(props.artifactBucket, `production/function-batch/artifact.zip`)
+      // code: lambda.Code.fromBucket(props.artifactBucket, `production/function-batch/artifact.zip`)
+      code: lambda.Code.fromInline('exports.awesomeBatch = function(event, ctx, cb) { console.log("Hola!"); }'),
     });
     const lambdaDeployStrategies: LambdaDeployStrategy[] = [
       {

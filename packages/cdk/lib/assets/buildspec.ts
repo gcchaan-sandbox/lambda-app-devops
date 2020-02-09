@@ -48,17 +48,17 @@ export const buildSpecLambda = {
       commands: [
         'cd packages/function-batch',
         'yarn run build',
-        'yarn run deploy',
+        // 'yarn run deploy',
         // S3にする
         // 'aws lambda update-function-code --function-name $FUNCTION_NAME --zip-file fileb://$ZIP_FILE --publish',
         // バージョンに対してE2Eテストしてリリース?
       ],
     },
   },
-  // artifacts: {
-  //   'base-directory': 'packages/function-batch/dist',
-  //   files: [
-  //     'artifact.zip',
-  //   ],
-  // },
+  artifacts: {
+    'base-directory': 'packages/function-batch/dist',
+    files: [
+      'artifact.zip',
+    ],
+  },
 }

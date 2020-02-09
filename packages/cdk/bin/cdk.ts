@@ -14,7 +14,7 @@ const ssm = new AWS.SSM({apiVersion: 'latest', region: 'ap-northeast-1'});
 const app = new cdk.App();
 
 async function main() {
-  let githubToken: string;
+  let githubToken = '';
   if(process.env.PREPARE && process.env.PREPARE === 'true') {
     const request = {
       Name: `/${settings.service}/GITHUB_TOKEN`,
@@ -31,20 +31,16 @@ async function main() {
   }
 
   // non-Stage Stack
-  const storageStack = new StorageStack(app, `${settings.service}-storage`, props);
-
-  // Stage Stack
-  settings.environments.forEach(env => {
-    const lambdaStack = new LambdaStack(app, `${settings.service}-lambda-${env}`, {
-      ...props,
-      artifactBucket: storageStack.artifactBucket,
-    });
-    new PipelineStack(app, `${settings.service}-pipeline-${env}`, {
-      ...props,
-      // lambdaCode: lambdaStack.lambdaCode,
-      lambdaFunction: lambdaStack.lambdaFunction,
-      githubToken: githubToken,
-    });
+  // const storageStack = new StorageStack(app, `${settings.service}-storage`, props);
+  const lambdaStack = new LambdaStack(app, `${settings.service}-lambda-${settings.stage}`, {
+    ...props,
+    // artifactBucket: storageStack.artifactBucket,
+  });
+  new PipelineStack(app, `${settings.service}-pipeline-${settings.stage}`, {
+    ...props,
+    // lambdaCode: lambdaStack.lambdaCode,
+    lambdaFunction: lambdaStack.lambdaFunction,
+    githubToken: githubToken,
   });
 }
 main();
